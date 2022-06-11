@@ -60,10 +60,10 @@ img_t* bmp_read(char* path) {
 	fseek(f, 0, SEEK_SET);
 	fread(data, bytesz, 1, f);
 	fclose(f);
-	if (data[0] != 66 || data[1] != 77) return NULL;
-	uint8_t off = data[10] + (data[11] << 8) + (data[12] << 16) + (data[13] << 24);
-	uint32_t w = data[18] + (data[19] << 8) + (data[20] << 16) + (data[21] << 24);
-	uint32_t h = data[22] + (data[23] << 8) + (data[24] << 16) + (data[25] << 24);
+	if (*data != 66 || *(data + 1) != 77) return NULL;
+	uint8_t off = *(data + 10) + (*(data + 11) << 8) + (*(data + 12) << 16) + (*(data + 13) << 24);
+	uint32_t w = *(data + 18) + (*(data + 19) << 8) + (*(data + 20) << 16) + (*(data + 21) << 24);
+	uint32_t h = *(data + 22) + (*(data + 23) << 8) + (*(data + 24) << 16) + (*(data + 25) << 24);
 	uint8_t p = 4 - (w * 3) % 4;
 	if (p == 4) p = 0;
 	img_t* img = malloc(sizeof(img_t));
