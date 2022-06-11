@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 typedef struct img_s {
-	uint8_t*** pix;
+	uint8_t* pix;
 	uint32_t w;
 	uint32_t h;
 } img_t;
@@ -28,30 +28,7 @@ img_t* img_init(uint32_t w, uint32_t h) {
 	img_t* img = malloc(sizeof(img_t));
 	img->w = w;
 	img->h = h;
-	img->pix = malloc(8 * h);
-	for (uint32_t hi = 0; hi < h; hi++) {
-		img->pix[hi] = malloc(8 * w);
-		for (uint32_t wi = 0; wi < w; wi++) {
-			img->pix[hi][wi] = calloc(3, 1);
-		}
-	}
-	return img;
-}
-
-img_t* img_init_col(uint32_t w, uint32_t h, uint8_t r, uint8_t g, uint8_t b) {
-	img_t* img = malloc(sizeof(img_t));
-	img->w = w;
-	img->h = h;
-	img->pix = malloc(8 * h);
-	for (uint32_t hi = 0; hi < h; hi++) {
-		img->pix[hi] = malloc(8 * w);
-		for (uint32_t wi = 0; wi < w; wi++) {
-			img->pix[hi][wi] = malloc(3);
-			img->pix[hi][wi][0] = r;
-			img->pix[hi][wi][1] = g;
-			img->pix[hi][wi][2] = b;
-		}
-	}
+	img->pix = malloc(24 * w * h);
 	return img;
 }
 
@@ -59,15 +36,13 @@ img_t* img_init_pix(uint32_t w, uint32_t h, uint8_t* data, uint8_t off, uint8_t 
 	img_t* img = malloc(sizeof(img_t));
 	img->w = w;
 	img->h = h;
-	img->pix = malloc(8 * h);
+	img->pix = malloc(24 * w * h);
 	uint32_t indx = off;
 	for (uint32_t hi = 0; hi < h; hi++) {
-		img->pix[hi] = malloc(8 * w);
 		for (uint32_t wi = 0; wi < w; wi++) {
-			img->pix[hi][wi] = malloc(3);
-			img->pix[hi][wi][0] = data[indx + 2];
-			img->pix[hi][wi][1] = data[indx + 1];
-			img->pix[hi][wi][2] = data[indx];
+			*(img->pix + (hi * w * 3) + (wi * 3)) = *(data + indx + 2);
+			*(img->pix + (hi * w * 3) + (wi * 3) + 1) = *(data + indx + 1);
+			*(img->pix + (hi * w * 3) + (wi * 3) + 2) = *(data + indx);
 			indx += 3;
 		}
 		indx += p;
@@ -76,9 +51,8 @@ img_t* img_init_pix(uint32_t w, uint32_t h, uint8_t* data, uint8_t off, uint8_t 
 }
 
 img_t* img_resz(img_t* img, uint32_t w, uint32_t h) {
-	uint8_t*** pix = malloc(8 * h);
+	uint8_t* pix = malloc(24 * w * h);
 	for (uint32_t hi = 0; hi < h; hi++) {
-		pix[hi] = malloc(8 * w);
 		for (uint32_t wi = 0; wi < w; wi++) {
 			uint64_t r = 0;
 			uint64_t g = 0;
@@ -87,17 +61,16 @@ img_t* img_resz(img_t* img, uint32_t w, uint32_t h) {
 			for (uint32_t hj = (img->h * hi) / h; hj <= (img->h * (hi + 1)) / h; hj++) {
 				for (uint32_t wj = (img->w * wi) / w; wj <= (img->w * (wi + 1)) / w; wj++) {
 					if (wj < img->w && hj < img->h) {
-						r += img->pix[hj][wj][0];
-						g += img->pix[hj][wj][1];
-						b += img->pix[hj][wj][2];
+						r += *(img->pix + (hj * img->w * 3) + (wj * 3));
+						g += *(img->pix + (hj * img->w * 3) + (wj * 3) + 1);
+						b += *(img->pix + (hj * img->w * 3) + (wj * 3) + 2);
 						cnt++;
 					}
 				}
 			}
-			pix[hi][wi] = malloc(3);
-			pix[hi][wi][0] = (uint8_t) (r / cnt);
-			pix[hi][wi][1] = (uint8_t) (g / cnt);
-			pix[hi][wi][2] = (uint8_t) (b / cnt);
+			*(pix + (hi * w * 3) + (wi * 3)) = (uint8_t) (r / cnt);
+			*(pix + (hi * w * 3) + (wi * 3) + 1) = (uint8_t) (g / cnt);
+			*(pix + (hi * w * 3) + (wi * 3) + 2) = (uint8_t) (b / cnt);
 		}
 	}
 	free(img->pix);
@@ -108,10 +81,6 @@ img_t* img_resz(img_t* img, uint32_t w, uint32_t h) {
 }
 
 void img_clr(img_t* img) {
-	for (uint32_t hi = 0; hi < img->h; hi++) {
-		for (uint32_t wi = 0; wi < img->w; wi++) free(img->pix[hi][wi]);
-		free(img->pix[hi]);
-	}
 	free(img->pix);
 	free(img);
 }

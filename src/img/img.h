@@ -18,14 +18,12 @@
 #include <stdint.h>
 
 typedef struct img_s {
-	uint8_t*** pix;
+	uint8_t* pix;
 	uint32_t w;
 	uint32_t h;
 } img_t;
 
 img_t* img_init(uint32_t, uint32_t);
-
-img_t* img_init_col(uint32_t, uint32_t, uint8_t, uint8_t, uint8_t);
 
 img_t* img_init_pix(uint32_t, uint32_t, uint8_t*, uint8_t, uint8_t);
 

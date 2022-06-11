@@ -42,9 +42,9 @@ void bmp_write(img_t* img, char* path) {
 	fprintf(f, "%c%c%c%c%c%c%c%c", 0, 0, 0, 0, 0, 0, 0, 0); //junk
 	for (uint32_t hi = 0; hi < img->h; hi++) {
 		for (uint32_t wi = 0; wi < img->w; wi++) {
-			fprintf(f, "%c", img->pix[hi][wi][2]); //blue
-			fprintf(f, "%c", img->pix[hi][wi][1]); //green
-			fprintf(f, "%c", img->pix[hi][wi][0]); //red
+			fprintf(f, "%c", *(img->pix + (hi * img->w * 3) + (wi * 3) + 2)); //blue
+			fprintf(f, "%c", *(img->pix + (hi * img->w * 3) + (wi * 3) + 1)); //green
+			fprintf(f, "%c", *(img->pix + (hi * img->w * 3) + (wi * 3))); //red
 		}
 		for (uint8_t wi = 0; wi < p; wi++) fprintf(f, "%c", 0); //padding
 	}
