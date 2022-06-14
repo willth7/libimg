@@ -14,70 +14,143 @@
 
 //TODO
 //	color manipulation functions
+//	optimize image type differentiation
 
 #include <stdint.h>
 #include <stdlib.h>
 
+#define IMG_R8G8B8 0
+#define IMG_R8G8B8A8 1
+
 typedef struct img_s {
 	uint8_t* pix;
+	uint8_t type;
 	uint32_t w;
 	uint32_t h;
 } img_t;
 
-img_t* img_init(uint32_t w, uint32_t h) {
-	img_t* img = malloc(sizeof(img_t));
-	img->w = w;
-	img->h = h;
-	img->pix = malloc(24 * w * h);
-	return img;
+img_t* img_init(uint8_t type, uint32_t w, uint32_t h) {
+	if (type == IMG_R8G8B8) {
+		img_t* img = malloc(sizeof(img_t));
+		img->pix = malloc(24 * w * h);
+		img->w = w;
+		img->h = h;
+		img->type = type;
+		return img;
+	}
+	else if (type == IMG_R8G8B8A8) {
+		img_t* img = malloc(sizeof(img_t));
+		img->pix = malloc(32 * w * h);
+		img->w = w;
+		img->h = h;
+		img->type = type;
+		return img;
+	}
+	return NULL;
 }
 
-img_t* img_init_pix(uint32_t w, uint32_t h, uint8_t* data, uint8_t off, uint8_t p) {
-	img_t* img = malloc(sizeof(img_t));
-	img->w = w;
-	img->h = h;
-	img->pix = malloc(24 * w * h);
-	uint32_t indx = off;
-	for (uint32_t hi = 0; hi < h; hi++) {
-		for (uint32_t wi = 0; wi < w; wi++) {
-			*(img->pix + (hi * w * 3) + (wi * 3)) = *(data + indx + 2);
-			*(img->pix + (hi * w * 3) + (wi * 3) + 1) = *(data + indx + 1);
-			*(img->pix + (hi * w * 3) + (wi * 3) + 2) = *(data + indx);
-			indx += 3;
+img_t* img_init_raw(uint8_t type, uint32_t w, uint32_t h, uint8_t* data, uint8_t off, uint8_t p) {
+	if (type == IMG_R8G8B8) {
+		img_t* img = malloc(sizeof(img_t));
+		img->pix = malloc(24 * w * h);
+		uint32_t indx = off;
+		for (uint32_t hi = 0; hi < h; hi++) {
+			for (uint32_t wi = 0; wi < w; wi++) {
+				*(img->pix + (hi * w * 3) + (wi * 3)) = *(data + indx + 2);
+				*(img->pix + (hi * w * 3) + (wi * 3) + 1) = *(data + indx + 1);
+				*(img->pix + (hi * w * 3) + (wi * 3) + 2) = *(data + indx);
+				indx += 3;
+			}
+			indx += p;
 		}
-		indx += p;
+		img->type = type;
+		img->w = w;
+		img->h = h;
+		return img;
 	}
-	return img;
+	else if (type == IMG_R8G8B8A8) {
+		img_t* img = malloc(sizeof(img_t));
+		img->pix = malloc(32 * w * h);
+		uint32_t indx = off;
+		for (uint32_t hi = 0; hi < h; hi++) {
+			for (uint32_t wi = 0; wi < w; wi++) {
+				*(img->pix + (hi * w * 4) + (wi * 4)) = *(data + indx + 2);
+				*(img->pix + (hi * w * 4) + (wi * 4) + 1) = *(data + indx + 1);
+				*(img->pix + (hi * w * 4) + (wi * 4) + 2) = *(data + indx);
+				*(img->pix + (hi * w * 4) + (wi * 4) + 3) = *(data + indx + 3);
+				indx += 4;
+			}
+		}
+		img->type = type;
+		img->w = w;
+		img->h = h;
+		return img;
+	}
+	return NULL;
 }
 
 img_t* img_resz(img_t* img, uint32_t w, uint32_t h) {
-	uint8_t* pix = malloc(24 * w * h);
-	for (uint32_t hi = 0; hi < h; hi++) {
-		for (uint32_t wi = 0; wi < w; wi++) {
-			uint64_t r = 0;
-			uint64_t g = 0;
-			uint64_t b = 0;
-			uint64_t cnt = 0;
-			for (uint32_t hj = (img->h * hi) / h; hj <= (img->h * (hi + 1)) / h; hj++) {
-				for (uint32_t wj = (img->w * wi) / w; wj <= (img->w * (wi + 1)) / w; wj++) {
-					if (wj < img->w && hj < img->h) {
-						r += *(img->pix + (hj * img->w * 3) + (wj * 3));
-						g += *(img->pix + (hj * img->w * 3) + (wj * 3) + 1);
-						b += *(img->pix + (hj * img->w * 3) + (wj * 3) + 2);
-						cnt++;
+	if (img->type == IMG_R8G8B8) {
+		uint8_t* pix = malloc(24 * w * h);
+		for (uint32_t hi = 0; hi < h; hi++) {
+			for (uint32_t wi = 0; wi < w; wi++) {
+				uint64_t r = 0;
+				uint64_t g = 0;
+				uint64_t b = 0;
+				uint64_t cnt = 0;
+				for (uint32_t hj = (img->h * hi) / h; hj <= (img->h * (hi + 1)) / h; hj++) {
+					for (uint32_t wj = (img->w * wi) / w; wj <= (img->w * (wi + 1)) / w; wj++) {
+						if (wj < img->w && hj < img->h) {
+							r += *(img->pix + (hj * img->w * 3) + (wj * 3));
+							g += *(img->pix + (hj * img->w * 3) + (wj * 3) + 1);
+							b += *(img->pix + (hj * img->w * 3) + (wj * 3) + 2);
+							cnt++;
+						}
 					}
 				}
+				*(pix + (hi * w * 3) + (wi * 3)) = (uint8_t) (r / cnt);
+				*(pix + (hi * w * 3) + (wi * 3) + 1) = (uint8_t) (g / cnt);
+				*(pix + (hi * w * 3) + (wi * 3) + 2) = (uint8_t) (b / cnt);
 			}
-			*(pix + (hi * w * 3) + (wi * 3)) = (uint8_t) (r / cnt);
-			*(pix + (hi * w * 3) + (wi * 3) + 1) = (uint8_t) (g / cnt);
-			*(pix + (hi * w * 3) + (wi * 3) + 2) = (uint8_t) (b / cnt);
 		}
+		free(img->pix);
+		img->pix = pix;
+		img->w = w;
+		img->h = h;
+		return img;
 	}
-	free(img->pix);
-	img->pix = pix;
-	img->w = w;
-	img->h = h;
-	return img;
+	else if (img->type == IMG_R8G8B8A8) {
+		uint8_t* pix = malloc(32 * w * h);
+		for (uint32_t hi = 0; hi < h; hi++) {
+			for (uint32_t wi = 0; wi < w; wi++) {
+				uint64_t r = 0;
+				uint64_t g = 0;
+				uint64_t b = 0;
+				uint64_t a = 0;
+				uint64_t cnt = 0;
+				for (uint32_t hj = (img->h * hi) / h; hj <= (img->h * (hi + 1)) / h; hj++) {
+					for (uint32_t wj = (img->w * wi) / w; wj <= (img->w * (wi + 1)) / w; wj++) {
+						if (wj < img->w && hj < img->h) {
+							r += *(img->pix + (hj * img->w * 4) + (wj * 4));
+							g += *(img->pix + (hj * img->w * 4) + (wj * 4) + 1);
+							b += *(img->pix + (hj * img->w * 4) + (wj * 4) + 2);
+							a += *(img->pix + (hj * img->w * 4) + (wj * 4) + 3);
+							cnt++;
+						}
+					}
+				}
+				*(pix + (hi * w * 4) + (wi * 4)) = (uint8_t) (r / cnt);
+				*(pix + (hi * w * 4) + (wi * 4) + 1) = (uint8_t) (g / cnt);
+				*(pix + (hi * w * 4) + (wi * 4) + 2) = (uint8_t) (b / cnt);
+				*(pix + (hi * w * 4) + (wi * 4) + 3) = (uint8_t) (a / cnt);
+			}
+		}
+		free(img->pix);
+		img->pix = pix;
+		img->w = w;
+		img->h = h;
+		return img;
+	}
 }
 
 void img_clr(img_t* img) {
