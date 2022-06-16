@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void bmp_write(img_t* img, char* path) {
+void bmp_write(img_t* img, int8_t* path) {
 	if (img->type == IMG_R8G8B8) {
 		uint8_t p = 4 - (img->w * 3) % 4;
 		if (p == 4) p = 0;
@@ -28,16 +28,16 @@ void bmp_write(img_t* img, char* path) {
 		uint32_t psz = (img->w * 3 + p) * img->h;
 		FILE* f = fopen(path, "w");
 		fprintf(f, "%c%c", 66, 77); //signature
-		fprintf(f, "%c%c%c%c", (char) fsz & 255, (char) (fsz >> 8) & 255, (char) (fsz >> 16) & 255, (char) (fsz >> 24) & 255); //file size
+		fprintf(f, "%c%c%c%c", (int8_t) fsz & 255, (int8_t) (fsz >> 8) & 255, (int8_t) (fsz >> 16) & 255, (int8_t) (fsz >> 24) & 255); //file size
 		fprintf(f, "%c%c%c%c", 0, 0, 0, 0); //reserved
 		fprintf(f, "%c%c%c%c", 54, 0, 0, 0); //pixel array offset
 		fprintf(f, "%c%c%c%c", 40, 0, 0, 0); //DIB header size
-		fprintf(f, "%c%c%c%c", (char) img->w & 255, (char) (img->w >> 8) & 255, (char) (img->w >> 16) & 255, (char) (img->w >> 24) & 255); //width
-		fprintf(f, "%c%c%c%c", (char) img->h & 255, (char) (img->h >> 8) & 255, (char) (img->h >> 16) & 255, (char) (img->h >> 24) & 255); //height
+		fprintf(f, "%c%c%c%c", (int8_t) img->w & 255, (int8_t) (img->w >> 8) & 255, (int8_t) (img->w >> 16) & 255, (int8_t) (img->w >> 24) & 255); //width
+		fprintf(f, "%c%c%c%c", (int8_t) img->h & 255, (int8_t) (img->h >> 8) & 255, (int8_t) (img->h >> 16) & 255, (int8_t) (img->h >> 24) & 255); //height
 		fprintf(f, "%c%c", 1, 0); //colors panes
 		fprintf(f, "%c%c", 24, 0); //bits per pixel
 		fprintf(f, "%c%c%c%c", 0, 0, 0, 0); //compression
-		fprintf(f, "%c%c%c%c", (char) psz & 255, (char) (psz >> 8) & 255, (char) (psz >> 16) & 255, (char) (psz >> 24) & 255); //pixel array size
+		fprintf(f, "%c%c%c%c", (int8_t) psz & 255, (int8_t) (psz >> 8) & 255, (int8_t) (psz >> 16) & 255, (int8_t) (psz >> 24) & 255); //pixel array size
 		fprintf(f, "%c%c%c%c", 35, 46, 0, 0); //horizontal resolution
 		fprintf(f, "%c%c%c%c", 35, 46, 0, 0); //vertical resolution
 		fprintf(f, "%c%c%c%c%c%c%c%c", 0, 0, 0, 0, 0, 0, 0, 0); //junk
@@ -56,16 +56,16 @@ void bmp_write(img_t* img, char* path) {
 		uint32_t psz = (img->w * 4) * img->h;
 		FILE* f = fopen(path, "w");
 		fprintf(f, "%c%c", 66, 77); //signature
-		fprintf(f, "%c%c%c%c", (char) fsz & 255, (char) (fsz >> 8) & 255, (char) (fsz >> 16) & 255, (char) (fsz >> 24) & 255); //file size
+		fprintf(f, "%c%c%c%c", (int8_t) fsz & 255, (int8_t) (fsz >> 8) & 255, (int8_t) (fsz >> 16) & 255, (int8_t) (fsz >> 24) & 255); //file size
 		fprintf(f, "%c%c%c%c", 0, 0, 0, 0); //reserved
 		fprintf(f, "%c%c%c%c", 70, 0, 0, 0); //pixel array offset
 		fprintf(f, "%c%c%c%c", 56, 0, 0, 0); //DIB header size
-		fprintf(f, "%c%c%c%c", (char) img->w & 255, (char) (img->w >> 8) & 255, (char) (img->w >> 16) & 255, (char) (img->w >> 24) & 255); //width
-		fprintf(f, "%c%c%c%c", (char) img->h & 255, (char) (img->h >> 8) & 255, (char) (img->h >> 16) & 255, (char) (img->h >> 24) & 255); //height
+		fprintf(f, "%c%c%c%c", (int8_t) img->w & 255, (int8_t) (img->w >> 8) & 255, (int8_t) (img->w >> 16) & 255, (int8_t) (img->w >> 24) & 255); //width
+		fprintf(f, "%c%c%c%c", (int8_t) img->h & 255, (int8_t) (img->h >> 8) & 255, (int8_t) (img->h >> 16) & 255, (int8_t) (img->h >> 24) & 255); //height
 		fprintf(f, "%c%c", 1, 0); //colors panes
 		fprintf(f, "%c%c", 32, 0); //bits per pixel
 		fprintf(f, "%c%c%c%c", 0, 0, 0, 0); //compression
-		fprintf(f, "%c%c%c%c", (char) psz & 255, (char) (psz >> 8) & 255, (char) (psz >> 16) & 255, (char) (psz >> 24) & 255); //pixel array size
+		fprintf(f, "%c%c%c%c", (int8_t) psz & 255, (int8_t) (psz >> 8) & 255, (int8_t) (psz >> 16) & 255, (int8_t) (psz >> 24) & 255); //pixel array size
 		fprintf(f, "%c%c%c%c", 35, 46, 0, 0); //horizontal resolution
 		fprintf(f, "%c%c%c%c", 35, 46, 0, 0); //vertical resolution
 		fprintf(f, "%c%c%c%c%c%c%c%c", 0, 0, 0, 0, 0, 0, 0, 0); //junk
@@ -82,7 +82,7 @@ void bmp_write(img_t* img, char* path) {
 	}
 }
 
-img_t* bmp_read(char* path) {
+img_t* bmp_read(int8_t* path) {
 	FILE* f = fopen(path, "r");
 	if (f == NULL) return NULL;
 	fseek(f, 0, SEEK_END);
