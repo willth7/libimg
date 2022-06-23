@@ -13,8 +13,9 @@
 //   limitations under the License.
 
 //TODO
-//	color manipulation functions
+//	rotation functions
 //	optimize image type differentiation
+//	color manipulation functions
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -149,6 +150,66 @@ img_t* img_resz(img_t* img, uint32_t w, uint32_t h) {
 		img->pix = pix;
 		img->w = w;
 		img->h = h;
+		return img;
+	}
+}
+
+img_t* img_flip_h(img_t* img) {
+	if (img->type == IMG_R8G8B8) {
+		uint8_t* pix = malloc(24 * img->w * img->h);
+		for (uint32_t hi = 0; hi < img->h; hi++) {
+			for (uint32_t wi = 0; wi < img->w; wi++) {
+				*(pix + (hi * img->w * 3) + (wi * 3)) = *(img->pix + ((img->h - (hi + 1)) * img->w * 3) + (wi * 3));
+				*(pix + (hi * img->w * 3) + (wi * 3) + 1) = *(img->pix + ((img->h - (hi + 1)) * img->w * 3) + (wi * 3) + 1);
+				*(pix + (hi * img->w * 3) + (wi * 3) + 2) = *(img->pix + ((img->h - (hi + 1)) * img->w * 3) + (wi * 3) + 2);
+			}
+		}
+		free(img->pix);
+		img->pix = pix;
+		return img;
+	}
+	else if (img->type == IMG_R8G8B8A8) {
+		uint8_t* pix = malloc(32 * img->w * img->h);
+		for (uint32_t hi = 0; hi < img->h; hi++) {
+			for (uint32_t wi = 0; wi < img->w; wi++) {
+				*(pix + (hi * img->w * 4) + (wi * 4)) = *(img->pix + ((img->h - (hi + 1)) * img->w * 4) + (wi * 4));
+				*(pix + (hi * img->w * 4) + (wi * 4) + 1) = *(img->pix + ((img->h - (hi + 1)) * img->w * 4) + (wi * 4) + 1);
+				*(pix + (hi * img->w * 4) + (wi * 4) + 2) = *(img->pix + ((img->h - (hi + 1)) * img->w * 4) + (wi * 4) + 2);
+				*(pix + (hi * img->w * 4) + (wi * 4) + 3) = *(img->pix + ((img->h - (hi + 1)) * img->w * 4) + (wi * 4) + 3);
+			}
+		}
+		free(img->pix);
+		img->pix = pix;
+		return img;
+	}
+}
+
+img_t* img_flip_v(img_t* img) {
+	if (img->type == IMG_R8G8B8) {
+		uint8_t* pix = malloc(24 * img->w * img->h);
+		for (uint32_t hi = 0; hi < img->h; hi++) {
+			for (uint32_t wi = 0; wi < img->w; wi++) {
+				*(pix + (hi * img->w * 3) + (wi * 3)) = *(img->pix + (hi * img->w * 3) + ((img->w - (wi + 1)) * 3));
+				*(pix + (hi * img->w * 3) + (wi * 3) + 1) = *(img->pix + (hi * img->w * 3) + ((img->w - (wi + 1)) * 3) + 1);
+				*(pix + (hi * img->w * 3) + (wi * 3) + 2) = *(img->pix + (hi * img->w * 3) + ((img->w - (wi + 1)) * 3) + 2);
+			}
+		}
+		free(img->pix);
+		img->pix = pix;
+		return img;
+	}
+	else if (img->type == IMG_R8G8B8A8) {
+		uint8_t* pix = malloc(32 * img->w * img->h);
+		for (uint32_t hi = 0; hi < img->h; hi++) {
+			for (uint32_t wi = 0; wi < img->w; wi++) {
+				*(pix + (hi * img->w * 4) + (wi * 4)) = *(img->pix + (hi * img->w * 4) + ((img->w - (wi + 1)) * 4));
+				*(pix + (hi * img->w * 4) + (wi * 4) + 1) = *(img->pix + (hi * img->w * 4) + ((img->w - (wi + 1)) * 4) + 1);
+				*(pix + (hi * img->w * 4) + (wi * 4) + 2) = *(img->pix + (hi * img->w * 4) + ((img->w - (wi + 1)) * 4) + 2);
+				*(pix + (hi * img->w * 4) + (wi * 4) + 3) = *(img->pix + (hi * img->w * 4) + ((img->w - (wi + 1)) * 4) + 3);
+			}
+		}
+		free(img->pix);
+		img->pix = pix;
 		return img;
 	}
 }

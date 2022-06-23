@@ -33,6 +33,10 @@ img_t* img_init_raw(uint8_t, uint32_t, uint32_t, uint8_t*, uint8_t, uint8_t);
 
 img_t* img_resz(img_t*, uint32_t, uint32_t);
 
+img_t* img_flip_h(img_t*);
+
+img_t* img_flip_v(img_t*);
+
 void img_clr(img_t*);
 
 #endif
