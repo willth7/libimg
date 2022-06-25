@@ -15,6 +15,8 @@
 #ifndef _IMG_BMP_H
 #define _IMG_BMP_H
 
+#include <stdint.h>
+
 void bmp_write(img_t*, int8_t*);
 
 img_t* bmp_read(int8_t*);

@@ -47,7 +47,7 @@ img_t* img_init(uint8_t type, uint32_t w, uint32_t h) {
 		img->type = type;
 		return img;
 	}
-	return NULL;
+	return 0;
 }
 
 img_t* img_init_raw(uint8_t type, uint32_t w, uint32_t h, uint8_t* data, uint8_t off, uint8_t p) {
@@ -87,7 +87,7 @@ img_t* img_init_raw(uint8_t type, uint32_t w, uint32_t h, uint8_t* data, uint8_t
 		img->h = h;
 		return img;
 	}
-	return NULL;
+	return 0;
 }
 
 img_t* img_resz(img_t* img, uint32_t w, uint32_t h) {

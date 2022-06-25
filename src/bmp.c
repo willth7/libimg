@@ -15,7 +15,7 @@
 //TODO
 //	optimize image type differentiation
 
-#include <img/img.h>
+#include "img/img.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -84,14 +84,14 @@ void bmp_write(img_t* img, int8_t* path) {
 
 img_t* bmp_read(int8_t* path) {
 	FILE* f = fopen(path, "r");
-	if (f == NULL) return NULL;
+	if (f == 0) return 0;
 	fseek(f, 0, SEEK_END);
 	uint64_t bytesz = ftell(f);
 	uint8_t* data = malloc(bytesz);
 	fseek(f, 0, SEEK_SET);
 	fread(data, bytesz, 1, f);
 	fclose(f);
-	if (*data != 66 || *(data + 1) != 77) return NULL;
+	if (*data != 66 || *(data + 1) != 77) return 0;
 	uint8_t off = *(data + 10) + (*(data + 11) << 8) + (*(data + 12) << 16) + (*(data + 13) << 24);
 	uint32_t w = *(data + 18) + (*(data + 19) << 8) + (*(data + 20) << 16) + (*(data + 21) << 24);
 	uint32_t h = *(data + 22) + (*(data + 23) << 8) + (*(data + 24) << 16) + (*(data + 25) << 24);
@@ -110,5 +110,5 @@ img_t* bmp_read(int8_t* path) {
 		free(data);
 		return img;
 	}
-	return NULL;
+	return 0;
 }
