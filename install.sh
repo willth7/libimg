@@ -1,4 +1,6 @@
 #!/bin/bash
 
 cp libimg.so /usr/lib/
-cp -R src/img /usr/include/
+mkdir /usr/include/img/
+cp src/img/img.h /usr/include/img/
+cp src/img/bmp.h /usr/include/img/
