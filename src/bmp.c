@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 void bmp_write(img_t* img, int8_t* path) {
-	if (img->type == IMG_R8G8B8) {
+	if (img->type == 0) {
 		uint8_t p = 4 - (img->w * 3) % 4;
 		if (p == 4) p = 0;
 		uint32_t fsz = (img->w * 3 + p) * img->h + 54;
@@ -51,7 +51,7 @@ void bmp_write(img_t* img, int8_t* path) {
 		}
 		fclose(f);
 	}
-	else if (img->type == IMG_R8G8B8A8) {
+	else if (img->type == 1) {
 		uint32_t fsz = (img->w * 4) * img->h + 70;
 		uint32_t psz = (img->w * 4) * img->h;
 		FILE* f = fopen(path, "w");
@@ -84,7 +84,9 @@ void bmp_write(img_t* img, int8_t* path) {
 
 img_t* bmp_read(int8_t* path) {
 	FILE* f = fopen(path, "r");
-	if (f == 0) return 0;
+	if (f == 0) {
+		return 0;
+	}
 	fseek(f, 0, SEEK_END);
 	uint64_t bytesz = ftell(f);
 	uint8_t* data = malloc(bytesz);
@@ -97,16 +99,12 @@ img_t* bmp_read(int8_t* path) {
 	uint32_t h = *(data + 22) + (*(data + 23) << 8) + (*(data + 24) << 16) + (*(data + 25) << 24);
 	uint16_t bpp = *(data + 28) + (*(data + 29) << 8);
 	if (bpp == 24) {
-		uint8_t p = 4 - (w * 3) % 4;
-		if (p == 4) p = 0;
-		img_t* img = malloc(sizeof(img_t));
-		img = img_init_raw(IMG_R8G8B8, w, h, data, off, p);
+		img_t* img = img_init_raw(0, w, h, data + off);
 		free(data);
 		return img;
 	}
 	else if (bpp == 32) {
-		img_t* img = malloc(sizeof(img_t));
-		img = img_init_raw(IMG_R8G8B8A8, w, h, data, off, 0);
+		img_t* img = img_init_raw(1, w, h, data, off, 0);
 		free(data);
 		return img;
 	}

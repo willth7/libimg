@@ -15,9 +15,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define IMG_R8G8B8 0
-#define IMG_R8G8B8A8 1
-
 typedef struct img_s {
 	uint8_t* pix;
 	uint8_t type;
@@ -26,7 +23,7 @@ typedef struct img_s {
 } img_t;
 
 img_t* img_init(uint8_t type, uint32_t w, uint32_t h) {
-	if (type == IMG_R8G8B8) {
+	if (type == 0) {
 		img_t* img = malloc(sizeof(img_t));
 		img->pix = malloc(24 * w * h);
 		img->w = w;
@@ -34,7 +31,7 @@ img_t* img_init(uint8_t type, uint32_t w, uint32_t h) {
 		img->type = type;
 		return img;
 	}
-	else if (type == IMG_R8G8B8A8) {
+	else if (type == 1) {
 		img_t* img = malloc(sizeof(img_t));
 		img->pix = malloc(32 * w * h);
 		img->w = w;
@@ -45,11 +42,15 @@ img_t* img_init(uint8_t type, uint32_t w, uint32_t h) {
 	return 0;
 }
 
-img_t* img_init_raw(uint8_t type, uint32_t w, uint32_t h, uint8_t* data, uint8_t off, uint8_t p) {
-	if (type == IMG_R8G8B8) {
+img_t* img_init_raw(uint8_t type, uint32_t w, uint32_t h, uint8_t* data) {
+	if (type == 0) {
 		img_t* img = malloc(sizeof(img_t));
 		img->pix = malloc(24 * w * h);
-		uint32_t indx = off;
+		uint8_t p = 4 - (w * 3) % 4;
+		if (p == 4) {
+			p = 0;
+		}
+		uint32_t indx = 0;
 		for (uint32_t hi = 0; hi < h; hi++) {
 			for (uint32_t wi = 0; wi < w; wi++) {
 				*(img->pix + (hi * w * 3) + (wi * 3)) = *(data + indx + 2);
@@ -64,7 +65,7 @@ img_t* img_init_raw(uint8_t type, uint32_t w, uint32_t h, uint8_t* data, uint8_t
 		img->h = h;
 		return img;
 	}
-	else if (type == IMG_R8G8B8A8) {
+	else if (type == 1) {
 		img_t* img = malloc(sizeof(img_t));
 		img->pix = malloc(32 * w * h);
 		uint32_t indx = off;
@@ -86,7 +87,7 @@ img_t* img_init_raw(uint8_t type, uint32_t w, uint32_t h, uint8_t* data, uint8_t
 }
 
 void img_resz(img_t* img, uint32_t w, uint32_t h) {
-	if (img->type == IMG_R8G8B8) {
+	if (img->type == 0) {
 		uint8_t* pix = malloc(24 * w * h);
 		for (uint32_t hi = 0; hi < h; hi++) {
 			for (uint32_t wi = 0; wi < w; wi++) {
@@ -114,7 +115,7 @@ void img_resz(img_t* img, uint32_t w, uint32_t h) {
 		img->w = w;
 		img->h = h;
 	}
-	else if (img->type == IMG_R8G8B8A8) {
+	else if (img->type == 1) {
 		uint8_t* pix = malloc(32 * w * h);
 		for (uint32_t hi = 0; hi < h; hi++) {
 			for (uint32_t wi = 0; wi < w; wi++) {
@@ -148,7 +149,7 @@ void img_resz(img_t* img, uint32_t w, uint32_t h) {
 }
 
 void img_flip_h(img_t* img) {
-	if (img->type == IMG_R8G8B8) {
+	if (img->type == 0) {
 		uint8_t* pix = malloc(24 * img->w * img->h);
 		for (uint32_t hi = 0; hi < img->h; hi++) {
 			for (uint32_t wi = 0; wi < img->w; wi++) {
@@ -160,7 +161,7 @@ void img_flip_h(img_t* img) {
 		free(img->pix);
 		img->pix = pix;
 	}
-	else if (img->type == IMG_R8G8B8A8) {
+	else if (img->type == 1) {
 		uint8_t* pix = malloc(32 * img->w * img->h);
 		for (uint32_t hi = 0; hi < img->h; hi++) {
 			for (uint32_t wi = 0; wi < img->w; wi++) {
@@ -176,7 +177,7 @@ void img_flip_h(img_t* img) {
 }
 
 void img_flip_v(img_t* img) {
-	if (img->type == IMG_R8G8B8) {
+	if (img->type == 0) {
 		uint8_t* pix = malloc(24 * img->w * img->h);
 		for (uint32_t hi = 0; hi < img->h; hi++) {
 			for (uint32_t wi = 0; wi < img->w; wi++) {
@@ -188,7 +189,7 @@ void img_flip_v(img_t* img) {
 		free(img->pix);
 		img->pix = pix;
 	}
-	else if (img->type == IMG_R8G8B8A8) {
+	else if (img->type == 1) {
 		uint8_t* pix = malloc(32 * img->w * img->h);
 		for (uint32_t hi = 0; hi < img->h; hi++) {
 			for (uint32_t wi = 0; wi < img->w; wi++) {
@@ -204,7 +205,7 @@ void img_flip_v(img_t* img) {
 }
 
 void img_rot_cw(img_t* img) {
-	if (img->type == IMG_R8G8B8) {
+	if (img->type == 0) {
 		uint8_t* pix = malloc(24 * img->w * img->h);
 		uint32_t w = img->h;
 		uint32_t h = img->w;
@@ -220,7 +221,7 @@ void img_rot_cw(img_t* img) {
 		img->w = w;
 		img->h = h;
 	}
-	else if (img->type == IMG_R8G8B8A8) {
+	else if (img->type == 1) {
 		uint8_t* pix = malloc(32 * img->w * img->h);
 		uint32_t w = img->h;
 		uint32_t h = img->w;
@@ -240,7 +241,7 @@ void img_rot_cw(img_t* img) {
 }
 
 void img_rot_ccw(img_t* img) {
-	if (img->type == IMG_R8G8B8) {
+	if (img->type == 0) {
 		uint8_t* pix = malloc(24 * img->w * img->h);
 		uint32_t w = img->h;
 		uint32_t h = img->w;
@@ -256,7 +257,7 @@ void img_rot_ccw(img_t* img) {
 		img->w = w;
 		img->h = h;
 	}
-	else if (img->type == IMG_R8G8B8A8) {
+	else if (img->type == 1) {
 		uint8_t* pix = malloc(32 * img->w * img->h);
 		uint32_t w = img->h;
 		uint32_t h = img->w;

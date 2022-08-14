@@ -17,9 +17,6 @@
 
 #include <stdint.h>
 
-#define IMG_R8G8B8 0
-#define IMG_R8G8B8A8 1
-
 typedef struct img_s {
 	uint8_t* pix;
 	uint8_t type;
@@ -29,7 +26,7 @@ typedef struct img_s {
 
 img_t* img_init(uint8_t, uint32_t, uint32_t);
 
-img_t* img_init_raw(uint8_t, uint32_t, uint32_t, uint8_t*, uint8_t, uint8_t);
+img_t* img_init_raw(uint8_t, uint32_t, uint32_t, uint8_t*);
 
 void img_resz(img_t*, uint32_t, uint32_t);
 
