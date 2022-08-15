@@ -86,6 +86,11 @@ img_t* img_init_raw(uint8_t type, uint32_t w, uint32_t h, uint8_t* data) {
 	return 0;
 }
 
+void img_clr(img_t* img) {
+	free(img->pix);
+	free(img);
+}
+
 void img_resz(img_t* img, uint32_t w, uint32_t h) {
 	if (img->type == 0) {
 		uint8_t* pix = malloc(24 * w * h);
@@ -139,6 +144,44 @@ void img_resz(img_t* img, uint32_t w, uint32_t h) {
 				*(pix + (hi * w * 4) + (wi * 4) + 1) = (uint8_t) (g / cnt);
 				*(pix + (hi * w * 4) + (wi * 4) + 2) = (uint8_t) (b / cnt);
 				*(pix + (hi * w * 4) + (wi * 4) + 3) = (uint8_t) (a / cnt);
+			}
+		}
+		free(img->pix);
+		img->pix = pix;
+		img->w = w;
+		img->h = h;
+	}
+}
+
+void img_crop(img_t* img, uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
+	if (img->type == 0) {
+		if ((x + w > img->w) || (y + h > img->h)) {
+			return;
+		}
+		uint8_t* pix = malloc(24 * w * h);
+		for (uint32_t hi = 0; hi < h; hi++) {
+			for (uint32_t wi = 0; wi < w; wi++) {
+				*(pix + (hi * w * 3) + (wi * 3)) = *(img->pix + ((hi + y) * img->w * 3) + ((wi + x) * 3));
+				*(pix + (hi * w * 3) + (wi * 3) + 1) = *(img->pix + ((hi + y) * img->w * 3) + ((wi + x) * 3) + 1);
+				*(pix + (hi * w * 3) + (wi * 3) + 2) = *(img->pix + ((hi + y) * img->w * 3) + ((wi + x) * 3) + 2);
+			}
+		}
+		free(img->pix);
+		img->pix = pix;
+		img->w = w;
+		img->h = h;
+	}
+	else if (img->type == 1) {
+		if ((x + w > img->w) || (y + h > img->h)) {
+			return;
+		}
+		uint8_t* pix = malloc(32 * w * h);
+		for (uint32_t hi = 0; hi < h; hi++) {
+			for (uint32_t wi = 0; wi < w; wi++) {
+				*(pix + (hi * w * 4) + (wi * 4)) = *(img->pix + ((hi + y) * img->w * 4) + ((wi + x) * 4));
+				*(pix + (hi * w * 4) + (wi * 4) + 1) = *(img->pix + ((hi + y) * img->w * 4) + ((wi + x) * 4) + 1);
+				*(pix + (hi * w * 4) + (wi * 4) + 2) = *(img->pix + ((hi + y) * img->w * 4) + ((wi + x) * 4) + 2);
+				*(pix + (hi * w * 4) + (wi * 4) + 3) = *(img->pix + ((hi + y) * img->w * 4) + ((wi + x) * 4) + 3);
 			}
 		}
 		free(img->pix);
@@ -276,7 +319,23 @@ void img_rot_ccw(img_t* img) {
 	}
 }
 
-void img_clr(img_t* img) {
-	free(img->pix);
-	free(img);
+void img_inv(img_t* img) {
+	if (img->type == 0) {
+		for (uint32_t h = 0; h < img->h; h++) {
+			for (uint32_t w = 0; w < img->w; w++) {
+				*(img->pix + (h * img->w * 3) + (w * 3)) = 255 - *(img->pix + (h * img->w * 3) + (w * 3));
+				*(img->pix + (h * img->w * 3) + (w * 3) + 1) = 255 - *(img->pix + (h * img->w * 3) + (w * 3) + 1);
+				*(img->pix + (h * img->w * 3) + (w * 3) + 2) = 255 - *(img->pix + (h * img->w * 3) + (w * 3) + 2);
+			}
+		}
+	}
+	else if (img->type == 1) {
+		for (uint32_t h = 0; h < img->h; h++) {
+			for (uint32_t w = 0; w < img->w; w++) {
+				*(img->pix + (h * img->w * 4) + (w * 4)) = 255 - *(img->pix + (h * img->w * 4) + (w * 4));
+				*(img->pix + (h * img->w * 4) + (w * 4) + 1) = 255 - *(img->pix + (h * img->w * 4) + (w * 4) + 1);
+				*(img->pix + (h * img->w * 4) + (w * 4) + 2) = 255 - *(img->pix + (h * img->w * 4) + (w * 4) + 2);
+			}
+		}
+	}
 }

@@ -28,7 +28,11 @@ img_t* img_init(uint8_t, uint32_t, uint32_t);
 
 img_t* img_init_raw(uint8_t, uint32_t, uint32_t, uint8_t*);
 
+void img_clr(img_t*);
+
 void img_resz(img_t*, uint32_t, uint32_t);
+
+void img_crop(img_t*, uint32_t, uint32_t, uint32_t, uint32_t);
 
 void img_flip_h(img_t*);
 
@@ -38,6 +42,6 @@ void img_rot_cw(img_t*);
 
 void img_rot_ccw(img_t*);
 
-void img_clr(img_t*);
+void img_inv(img_t*);
 
 #endif
