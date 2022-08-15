@@ -68,7 +68,7 @@ img_t* img_init_raw(uint8_t type, uint32_t w, uint32_t h, uint8_t* data) {
 	else if (type == 1) {
 		img_t* img = malloc(sizeof(img_t));
 		img->pix = malloc(32 * w * h);
-		uint32_t indx = off;
+		uint32_t indx = 0;
 		for (uint32_t hi = 0; hi < h; hi++) {
 			for (uint32_t wi = 0; wi < w; wi++) {
 				*(img->pix + (hi * w * 4) + (wi * 4)) = *(data + indx + 2);

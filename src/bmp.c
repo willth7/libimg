@@ -104,7 +104,7 @@ img_t* bmp_read(int8_t* path) {
 		return img;
 	}
 	else if (bpp == 32) {
-		img_t* img = img_init_raw(1, w, h, data, off, 0);
+		img_t* img = img_init_raw(1, w, h, data + off);
 		free(data);
 		return img;
 	}
